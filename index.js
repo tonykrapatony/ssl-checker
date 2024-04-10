@@ -54,5 +54,3 @@ export function startServer() {
     console.log("Server started on port" + PORT);
   })
 }
-
-startServer();
