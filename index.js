@@ -45,10 +45,14 @@ async function sendMessageToGroup() {
 
 setInterval(sendMessageToGroup, 30*1000);
 
-app.get('/', (req, res) => {
-  res.send('Service working');
-})
+export function startServer() {
+  app.get('/', (req, res) => {
+    res.send('Service working');
+  })
 
-app.listen(PORT, () => {
-  console.log("Server sterted on port" + PORT);
-})
+  app.listen(PORT, () => {
+    console.log("Server started on port" + PORT);
+  })
+}
+
+startServer();
