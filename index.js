@@ -7,11 +7,29 @@ import sites from './helpers/sites.js';
 const PORT = process.env.PORT || 5000;
 const token = process.env.TELEGRAM_BOT_TOKEN;
 
-const bot = new TelegramApi(token, {polling: true});
+const bot = new TelegramApi(token);
 
 const app = express();
 
-function startServer() {
+
+
+async function sendMessageToGroup() {
+  const chatId = process.env.CHAT_ID;
+  for (const element of sites) {
+    const result = await sslCheck(element);
+    if (result) {
+      bot.sendMessage(chatId, result);
+    }
+  }
+}
+
+setInterval(sendMessageToGroup, 30*1000);
+
+app.post('/webhook', (req, res) => {
+  const { message } = req.body;
+  const chatId = message.chat.id;
+  const msgText = message.text;
+
   bot.setMyCommands([
     {command: '/start', description: 'Запустити бота'},
   ])
@@ -33,26 +51,12 @@ function startServer() {
       }
     }
   });
-  
-  async function sendMessageToGroup() {
-    const chatId = process.env.CHAT_ID;
-    for (const element of sites) {
-      const result = await sslCheck(element);
-      if (result) {
-        bot.sendMessage(chatId, result);
-      }
-    }
-  }
-  
-  setInterval(sendMessageToGroup, 30*1000);
-  
-  app.get('/', (req, res) => {
-    res.send('Service working');
-  })
+});
 
-  app.listen(PORT, () => {
-    console.log("Server started on port" + PORT);
-  })
-}
+app.get('/', (req, res) => {
+  res.send('Service working');
+})
 
-startServer();
+app.listen(PORT, () => {
+  console.log("Server started on port" + PORT);
+})
